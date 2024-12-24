@@ -2,6 +2,7 @@
 
 void Enemy::move(int &life)
 {
+
     if (this->coords.first == fld->getWide() - 1)
     {
         direction = 'a';
@@ -12,12 +13,8 @@ void Enemy::move(int &life)
         direction = 'd';
         moveCoords('s');
     }
-    moveCoords(direction);
 
-    if (isPlayer() || isBulllet())
-    {
-        life--;
-    }
+    moveCoords(direction);
 }
 
 bool Enemy::isPlayer()

@@ -4,6 +4,11 @@ void Bullet::moveCoords(char mv)
 {
     int newIndexesX = coords.first, newIndexesY = coords.second;
     newIndexesY = (newIndexesY + 1);
+    if (newIndexesY == fld->getHeight())
+    {
+        life = 0;
+        return;
+    }
     setCoords(newIndexesX, newIndexesY);
 }
 

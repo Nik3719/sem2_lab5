@@ -2,7 +2,6 @@
 
 mutex mtx;
 
-
 Game::Game()
 {
     this->fl = new Field(30, 30);
@@ -48,6 +47,7 @@ void Game::fieldHandler()
             exit(1);
         }
         fl->printField();
+        cout << "SCORE = " << score << " LIFE = " << life << endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Небольшая пауза
         fl->printGap();
     }
@@ -60,24 +60,27 @@ void Game::enemyHandler()
         mtx.lock();
         if (rand() % 10 == 0)
         {
-            enemies.push_back(new Enemy('E', {rand() % 30, fl->getHeight() - 2}, fl, 1));
+
+            enemies.push_back(new Enemy('E', {rand() % 30, fl->getHeight() - 3}, fl, 1));
         }
         for (size_t i = 0; i < enemies.size(); i++)
         {
-            if (enemies[i]->getLife() <= 0)
-            {
-                enemies[i]->dead();
-                delete enemies[i]; // Освобождаем память
-                enemies.erase(enemies.begin() + i);
-                continue;
-            }
             pair<int, int> coordsEnemy = enemies[i]->getCoords();
             pair<int, int> newCoordsEnemy = enemies[i]->purposeCoords();
+            if (coordsEnemy.second == 1)
+            {
+                char block = (*fl)(coordsEnemy.first, coordsEnemy.second - 1);
+                (*fl)(coordsEnemy.first, coordsEnemy.second) = block;
+                delete enemies[i]; 
+                enemies.erase(enemies.begin() + i);
+                life--;
+                continue;
+            }
             if (newCoordsEnemy == player->getCoords())
             {
                 char block = fl->getBlock();
                 (*fl)(coordsEnemy.first, coordsEnemy.second) = block;
-                delete enemies[i]; // Освобождаем память
+                delete enemies[i]; 
                 enemies.erase(enemies.begin() + i);
                 life--;
                 continue;
@@ -89,11 +92,11 @@ void Game::enemyHandler()
                     char block = fl->getBlock();
                     (*fl)(coordsEnemy.first, coordsEnemy.second) = block;
 
-                    delete enemies[i]; // Освобождаем память
+                    delete enemies[i]; 
                     enemies.erase(enemies.begin() + i);
 
                     (*fl)(bullets[j]->getCoords().first, bullets[j]->getCoords().second) = block;
-                    delete bullets[j]; // Освобождаем память
+                    delete bullets[j]; 
                     bullets.erase(bullets.begin() + j);
 
                     score++;
@@ -101,16 +104,18 @@ void Game::enemyHandler()
                 }
             }
 
-            enemies[i]->move(life);
             coordsEnemy = enemies[i]->getCoords();
-            if (coordsEnemy.second == fl->getHeight() - 1)
+            if (coordsEnemy.second == 1)
             {
                 char block = (*fl)(coordsEnemy.first, coordsEnemy.second - 1);
                 (*fl)(coordsEnemy.first, coordsEnemy.second) = block;
-                delete enemies[i]; // Освобождаем память
+                delete enemies[i]; 
                 enemies.erase(enemies.begin() + i);
+                life--;
+
                 continue;
             }
+            enemies[i]->move(life);
         }
         mtx.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(300)); // Небольшая пауза
@@ -132,8 +137,13 @@ void Game::playerHandler()
             if (ch == ' ')
             {
                 // player.shot();
-                bullets.push_back(new Bullet('+', {player->getCoords().first, player->getCoords().second + 1}, fl, 1, this->player->idBullets));
-                this->player->idBullets++;
+                int coordY = player->getCoords().second + 1;
+                if (coordY != fl->getHeight())
+                {
+                    bullets.push_back(new Bullet('+', {player->getCoords().first, coordY},
+                                                 fl, 1, this->player->idBullets));
+                    this->player->idBullets++;
+                }
 
                 continue;
             }
@@ -146,12 +156,18 @@ void Game::playerHandler()
 
 void Game::bullethHandler()
 {
-   
+
     while (true)
     {
         mtx.lock();
         for (size_t i = 0; i < bullets.size(); i++)
         {
+            if (bullets[i]->getLife() == 0)
+            {
+                delete bullets[i]; 
+                bullets.erase(bullets.begin() + i);
+                continue;
+            }
             pair<int, int> coordsBullets = bullets[i]->getCoords();
 
             bullets[i]->moveCoords('w');
@@ -161,7 +177,7 @@ void Game::bullethHandler()
                 char block = (*fl)(coordsBullets.first, coordsBullets.second - 1);
 
                 (*fl)(coordsBullets.first, coordsBullets.second) = block;
-                delete bullets[i]; // Освобождаем память
+                delete bullets[i]; 
                 bullets.erase(bullets.begin() + i);
                 continue;
             }

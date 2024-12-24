@@ -48,6 +48,7 @@ public:
     Bullet(char character, pair<int, int> startCoords, Field *fld, int speed, int id)
         : Entinity(character, startCoords, fld, speed) { this->id = id; }
     void moveCoords(char mov) override;
+    int getLife() { return life; }
     // void setCoords(int newIndexesX, int newIndexesY) override;
 };
 

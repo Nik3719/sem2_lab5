@@ -12,13 +12,13 @@ void Entinity::moveCoords(char mov)
     {
     case 'w':
     {
-        newIndexesY = (newIndexesY + speed);
+        newIndexesY = (newIndexesY + 1);
         newIndexesY = newIndexesY == fld->getBarier() ? newIndexesY - 1 : newIndexesY;
         break;
     }
     case 's':
     {
-        newIndexesY = (newIndexesY - speed);
+        newIndexesY = (newIndexesY - 1);
         newIndexesY = newIndexesY < 0 ? fld->getBarier() - 1 : newIndexesY;
         break;
     }

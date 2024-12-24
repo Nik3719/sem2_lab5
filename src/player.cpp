@@ -7,14 +7,15 @@ void Player::moveCoords(char mov)
     {
     case 'w':
     {
-        newIndexesY = (newIndexesY + speed) % fld->getHeight();
-        // newIndexesY = newIndexesY == fld->getHeight() ? newIndexesY - 1 : newIndexesY;
+        newIndexesY = (newIndexesY + speed);// % fld->getHeight();
+        newIndexesY = newIndexesY == fld->getHeight() ? 1: newIndexesY;
         break;
     }
     case 's':
     {
         newIndexesY = (newIndexesY - speed);
         newIndexesY = newIndexesY < 0 ? fld->getHeight() - 1 : newIndexesY;
+        if( newIndexesY == 0) newIndexesY = fld->getHeight() - 1;
         break;
     }
     case 'd':

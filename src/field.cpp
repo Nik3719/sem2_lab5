@@ -8,11 +8,14 @@ Field::Field(int wide, int height) : wide(wide), height(height)
     field.resize(height);
     for (size_t i = 0; i < height; i++)
     {
+        if (i ==0) sym = '!';
         field[i].resize(wide);
         for (size_t j = 0; j < wide; j++)
         {
             field[i][j] = sym;
         }
+        if (i == 0) sym = block;
+        
     }
 }
 
@@ -42,6 +45,7 @@ char &Field::operator()(int heightIndex, int widthIndex)
     {
         return field[widthIndex][heightIndex];
     }
+
     throw std::out_of_range("Index out of bounds!");
 }
 
